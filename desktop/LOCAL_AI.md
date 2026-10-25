@@ -1,3 +1,5 @@
+Automatic first-launch setup: on a fresh installation Howdoey opens Settings and starts downloading and configuring the local Ollama runtime and Qwen3.5:2b model. Progress and Cancel are visible; failed/cancelled setup can be retried with Download local AI. Existing saved providers are preserved. The app ZIP does not contain runtime or model weights; each device downloads them during setup. No developer credentials or Claude subscription is included.
+
 # Local AI setup
 
 New installations default to the Ollama-compatible local endpoint, `http://127.0.0.1:11434/v1`, using `qwen3.5:2b` with screenshots enabled. Existing saved provider configuration is preserved.

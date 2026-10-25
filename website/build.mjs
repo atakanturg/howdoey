@@ -47,7 +47,7 @@ const checksums = `${sha256}  ${filename}\n`;
 await writeFile(join(output, 'downloads/SHA256SUMS.txt'), checksums);
 await writeFile(join(stage, 'downloads/SHA256SUMS.txt'), checksums);
 const publiclyAvailable = process.env.HOWDOEY_PUBLIC_DOWNLOADS !== 'false';
-await writeFile(join(output, 'releases.json'), JSON.stringify({ available: publiclyAvailable, filename, path: `/downloads/${filename}`, sha256, bytes, notarized: false, localModel: 'qwen3.5:2b', modelDownload: 'First launch, approximately 3 GB' }, null, 2));
+await writeFile(join(output, 'releases.json'), JSON.stringify({ available: publiclyAvailable, filename, path: `/downloads/${filename}`, sha256, bytes, notarized: false, localModel: 'qwen3.5:2b', modelDownload: 'Automatic first-launch download and configuration, approximately 3 GB' }, null, 2));
 // Pages rejects individual files above 25 MiB. Large artifacts belong in R2.
 async function ensureSize(path) {
   const { readdir } = await import('node:fs/promises');

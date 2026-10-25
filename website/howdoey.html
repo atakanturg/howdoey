@@ -142,7 +142,11 @@ main{position:relative;isolation:isolate}
       image.alt = 'A completed Howdoey ZIP in the browser downloads popup'; image.style.cssText = 'display:block;width:100%;height:auto;border-radius:16px;margin:20px 0';
       const link = document.createElement('a'); link.className = 'download-button'; link.href = url.href; link.download = build.filename;
       link.textContent = 'Download again';
-      $('dialog-content').append(image, link);
+      const setup = document.createElement('p');
+      setup.textContent = 'When you first open Howdoey, it automatically downloads Ollama and the Qwen3.5 2B AI model onto your Mac, then configures everything for you. No API key or separate Ollama installation is needed.';
+      const details = document.createElement('p');
+      details.textContent = 'Keep your internet connection on during the first setup (about 3 GB; allow 8 GB of free space). You can see progress or cancel in Settings. After setup, local AI runs on your own device. Enable Accessibility and Screen Recording when prompted. Requires an Apple silicon Mac with macOS 14 or later.';
+      $('dialog-content').append(image, setup, details, link);
       const start = document.createElement('a'); start.href = url.href; start.download = build.filename; document.body.append(start); start.click(); start.remove();
     } catch { openMessage('Download not available yet', 'The downloadable build has not been published here yet. Please check back soon.'); }
   }));

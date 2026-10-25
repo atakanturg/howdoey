@@ -67,7 +67,7 @@ struct SettingsView: View {
     private var localAI: some View {
         VStack(alignment:.leading,spacing:10) {
             Text("Local AI").font(.system(size:18,weight:.bold))
-            Text("Qwen3.5 2B runs on your Mac. Setup downloads about 3 GB, including the runtime if needed. Apple silicon required; allow 8 GB of free disk space. Model weights: Apache 2.0. Runtime: MIT.")
+            Text("Qwen3.5 2B runs on your Mac. First launch automatically downloads and configures Ollama and this model (about 3 GB). You can cancel or retry here. Apple silicon required; allow 8 GB of free disk space. Model weights: Apache 2.0. Runtime: MIT.")
                 .font(.system(size:14)).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true)
             HStack {
                 Button("Download local AI") { model.downloadLocalAI() }.disabled(model.isSettingUpLocalAI).buttonStyle(.borderedProminent)

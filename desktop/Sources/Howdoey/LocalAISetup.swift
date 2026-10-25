@@ -2,7 +2,7 @@ import AppKit
 import CryptoKit
 import HowdoeyCore
 
-/// Downloads are only started by the user's Download local AI button.
+/// Fresh installations set up local AI automatically; Settings provides retry/cancel.
 /// The developer's provider credentials are never part of this installation.
 @MainActor final class LocalAISetup {
     static let shared = LocalAISetup()
@@ -135,7 +135,7 @@ import HowdoeyCore
                 configuration = ProviderConfiguration(endpoint:"http://127.0.0.1:11434/v1",model:LocalAISetup.model,sendImages:true)
                 providerPreset = .ollama; apiKeyInput = ""; availableModels = [LocalAISetup.model]
                 saveSettings()
-                localAIStatus = "Local AI is ready. You can close Settings and ask Howdoey."
+                localAIStatus = "Local AI is ready and configured. Enable Accessibility and Screen Recording above, then close Settings to get help."
             } catch is CancellationError { localAIStatus = "Download stopped. Choose Download local AI to resume." }
             catch { localAIStatus = error.localizedDescription }
         }

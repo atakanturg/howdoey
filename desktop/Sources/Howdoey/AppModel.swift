@@ -4,8 +4,15 @@ import HowdoeyCore
 @MainActor extension AppModel {
     func restoreSettings() {
         if let data = UserDefaults.standard.data(forKey: "providerConfiguration"), let config = try? JSONDecoder().decode(ProviderConfiguration.self, from: data) { configuration = config }
-        if UserDefaults.standard.data(forKey:"providerConfiguration") == nil { showSettings = true }
-        if configuration.endpoint == "http://127.0.0.1:11434/v1" || configuration.endpoint == "http://localhost:11434/v1" {
+        let freshInstall = UserDefaults.standard.data(forKey:"providerConfiguration") == nil
+        if freshInstall {
+            showSettings = true
+            if !UserDefaults.standard.bool(forKey:"automaticLocalAISetupStarted") {
+                UserDefaults.standard.set(true,forKey:"automaticLocalAISetupStarted")
+                downloadLocalAI()
+            }
+        }
+        if !freshInstall && (configuration.endpoint == "http://127.0.0.1:11434/v1" || configuration.endpoint == "http://localhost:11434/v1") {
             Task { try? await LocalAISetup.shared.startInstalledService() }
         }
         apiKeyInput = configuration.endpoint == "http://127.0.0.1:8767/v1" ? "" : KeyStore.read(account: configuration.endpoint)

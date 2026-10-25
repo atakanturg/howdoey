@@ -1,3 +1,5 @@
+Automatic first-launch setup: on a fresh installation Howdoey opens Settings and starts downloading and configuring the local Ollama runtime and Qwen3.5:2b model. Progress and Cancel are visible; failed/cancelled setup can be retried with Download local AI. Existing saved providers are preserved. The app ZIP does not contain runtime or model weights; each device downloads them during setup. No developer credentials or Claude subscription is included.
+
 ## Current download publishing
 
 The app ZIP is now committed at `website/downloads/Howdoey-macOS-arm64.zip` and copied into the static deployment. It is approximately 1.8 MB, below Cloudflare’s per-file limit. App downloads are enabled by default with a same-origin URL; R2 is needed only for independent video hosting. Set `HOWDOEY_PUBLIC_DOWNLOADS=false` to disable the button deliberately. A build verifies the archive against `release-metadata.json` before publishing. Replace both together for future releases. No macOS build is required in Cloudflare. The app remains a development-signed, non-notarized beta.
