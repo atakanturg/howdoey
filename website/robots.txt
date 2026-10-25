@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /downloads/
+Disallow: /releases.json
+Sitemap: https://howdoey.com/sitemap.xml

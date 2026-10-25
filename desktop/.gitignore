@@ -1,0 +1,12 @@
+.build/
+dist/
+.DS_Store
+relay/.state/
+relay/.env
+relay/.env.*
+relay/node_modules/
+
+.local-backups/
+
+__pycache__/
+*.pyc

@@ -1,0 +1,74 @@
+import AppKit
+import SwiftUI
+import Carbon
+import HowdoeyCore
+
+@main struct HowdoeyLauncher {
+    static func main() {
+        let app = NSApplication.shared
+        let delegate = AppCoordinator()
+        app.delegate = delegate
+        app.setActivationPolicy(.accessory)
+        withExtendedLifetime(delegate) { app.run() }
+    }
+}
+@MainActor final class AppCoordinator: NSObject, NSApplicationDelegate {
+    let model = AppModel()
+    lazy var host = UIHost(model: model)
+    var statusItem: NSStatusItem?
+    var hotKey: GlobalHotKey?
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        let status = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        if let button = status.button {
+            button.image = NSImage(systemSymbolName: "viewfinder", accessibilityDescription: "Howdoey — help with your screen")
+            button.target = self; button.action = #selector(togglePanel)
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+            button.toolTip = "Howdoey · Control–Option–Space"
+        }
+        statusItem = status
+        host.install()
+        hotKey = GlobalHotKey { [weak self] in self?.host.togglePanel() }
+        let menu = NSMenu()
+        let appMenu = NSMenuItem(); menu.addItem(appMenu)
+        let submenu = NSMenu(); appMenu.submenu = submenu
+        submenu.addItem(withTitle: "About Howdoey", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
+        submenu.addItem(.separator())
+        submenu.addItem(withTitle: "Quit Howdoey", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let edit = NSMenuItem(); menu.addItem(edit); edit.submenu = NSMenu(title: "Edit")
+        for (title, action, key) in [("Cut", #selector(NSText.cut(_:)), "x"), ("Copy", #selector(NSText.copy(_:)), "c"), ("Paste", #selector(NSText.paste(_:)), "v"), ("Select All", #selector(NSText.selectAll(_:)), "a")] { edit.submenu?.addItem(withTitle: title, action: action, keyEquivalent: key) }
+        NSApp.mainMenu = menu
+        host.showPanel()
+    }
+    @objc func togglePanel() {
+        if NSApp.currentEvent?.type == .rightMouseUp {
+            let menu = NSMenu(); menu.addItem(withTitle: "Open Howdoey", action: #selector(showFromMenu), keyEquivalent: "")
+            menu.addItem(withTitle: "Stop current task", action: #selector(stopFromMenu), keyEquivalent: "")
+            menu.addItem(.separator()); menu.addItem(withTitle: "Quit Howdoey", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+            for item in menu.items where item.action != #selector(NSApplication.terminate(_:)) { item.target = self }
+            statusItem?.menu = menu; statusItem?.button?.performClick(nil); statusItem?.menu = nil
+        } else { host.togglePanel() }
+    }
+    @objc func showFromMenu() { host.showPanel() }
+    @objc func stopFromMenu() { model.stop(); host.showPanel() }
+    func applicationWillTerminate(_ notification: Notification) { model.stop() }
+
+}
+@MainActor final class GlobalHotKey {
+    private var ref: EventHotKeyRef?
+    private var handler: EventHandlerRef?
+    let fire: () -> Void
+    init(fire: @escaping () -> Void) {
+        self.fire = fire
+        var event = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
+        let opaque = Unmanaged.passUnretained(self).toOpaque()
+        InstallEventHandler(GetApplicationEventTarget(), { _, _, pointer in
+            guard let pointer else { return OSStatus(eventNotHandledErr) }
+            let owner = Unmanaged<GlobalHotKey>.fromOpaque(pointer).takeUnretainedValue()
+            DispatchQueue.main.async { owner.fire() }
+            return noErr
+        }, 1, &event, opaque, &handler)
+        let status = RegisterEventHotKey(UInt32(kVK_Space), UInt32(controlKey | optionKey), EventHotKeyID(signature: 0x48445759, id: 1), GetApplicationEventTarget(), 0, &ref)
+        if status != noErr { NSLog("Howdoey shortcut unavailable; use the menu bar icon.") }
+    }
+    deinit { if let ref { UnregisterEventHotKey(ref) }; if let handler { RemoveEventHandler(handler) } }
+}

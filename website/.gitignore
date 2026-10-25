@@ -1,0 +1,6 @@
+dist/
+.r2-staging/
+.wrangler/
+node_modules/
+.dev.vars
+.env*

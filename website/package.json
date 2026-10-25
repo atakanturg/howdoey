@@ -1,0 +1,11 @@
+{
+  "name": "howdoey-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node dev-server.mjs",
+    "build": "node build.mjs",
+    "upload:assets": "node upload-assets.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

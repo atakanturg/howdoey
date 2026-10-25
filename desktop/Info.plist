@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleExecutable</key><string>Howdoey</string>
+<key>CFBundleIdentifier</key><string>com.howdoey.desktop</string>
+<key>CFBundleName</key><string>Howdoey</string>
+<key>CFBundleDisplayName</key><string>Howdoey</string>
+<key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleShortVersionString</key><string>0.1.0</string>
+<key>CFBundleVersion</key><string>1</string>
+<key>CFBundleIconFile</key><string>AppIcon</string>
+<key>LSMinimumSystemVersion</key><string>14.0</string>
+<key>LSUIElement</key><true/>
+<key>NSPrincipalClass</key><string>NSApplication</string>
+<key>NSHighResolutionCapable</key><true/>
+<key>NSAccessibilityUsageDescription</key><string>Howdoey reads native controls to highlight the steps you can follow.</string>
+<key>NSScreenCaptureUsageDescription</key><string>Howdoey captures your selected area and the target app window to answer questions and verify task progress.</string>
+<key>NSAppTransportSecurity</key><dict><key>NSAllowsLocalNetworking</key><true/></dict>
+<key>NSHumanReadableCopyright</key><string>Howdoey — local development build</string>
+</dict></plist>
