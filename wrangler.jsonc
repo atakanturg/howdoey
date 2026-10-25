@@ -1,0 +1,7 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "howdoey",
+  "compatibility_date": "2026-10-25",
+  "build": { "command": "node website/build.mjs" },
+  "assets": { "directory": "./website/dist", "not_found_handling": "404-page" }
+}

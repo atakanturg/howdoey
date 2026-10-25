@@ -5,8 +5,10 @@ import { dirname, join } from 'node:path';
 const root = dirname(fileURLToPath(import.meta.url));
 const output = join(root, 'dist');
 const stage = join(root, '.r2-staging');
-const base = process.env.HOWDOEY_ASSETS_BASE_URL?.replace(/\/$/, '');
-if (!base) throw new Error('Set HOWDOEY_ASSETS_BASE_URL to your public HTTPS R2 custom domain before building. See README.md.');
+const configuredBase = process.env.HOWDOEY_ASSETS_BASE_URL?.replace(/\/$/, '');
+// Initial Git-connected deployment can serve the already-public recordings from GitHub.
+// Configure R2 for independently hosted release media and downloads.
+const base = configuredBase || 'https://raw.githubusercontent.com/atakanturg/howdoey/main/website';
 const url = new URL(base);
 if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) throw new Error('Assets base must be an HTTPS URL without credentials, query, or fragment.');
 await rm(output, { recursive: true, force: true });
@@ -32,6 +34,7 @@ await writeFile(join(output, 'index.html'), html);
 const filename = 'Howdoey-macOS-arm64.zip';
 const archive = join(root, '../desktop/dist', filename);
 const publiclyAvailable = process.env.HOWDOEY_PUBLIC_DOWNLOADS === 'true';
+if (publiclyAvailable && !configuredBase) throw new Error('Publishing downloads requires HOWDOEY_ASSETS_BASE_URL pointing to uploaded release artifacts.');
 let sha256 = null, bytes = null;
 try {
   const data = await readFile(archive); sha256 = createHash('sha256').update(data).digest('hex'); bytes = data.length;
@@ -56,4 +59,6 @@ async function ensureSize(path) {
   }
 }
 await ensureSize(output);
-console.log(`Pages output: ${output}\nR2 uploads: ${stage}\nPublic download enabled: ${publiclyAvailable}`);
+console.log(`Static output: ${output}\nR2 uploads: ${stage}\nPublic download enabled: ${publiclyAvailable}`);
+
+if (!configuredBase) console.log('Video source: public GitHub recordings. Configure HOWDOEY_ASSETS_BASE_URL for R2. App downloads remain unavailable until published.');
