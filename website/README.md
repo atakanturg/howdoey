@@ -1,3 +1,9 @@
+## Current download publishing
+
+The app ZIP is now committed at `website/downloads/Howdoey-macOS-arm64.zip` and copied into the static deployment. It is approximately 1.8 MB, below Cloudflare’s per-file limit. App downloads are enabled by default with a same-origin URL; R2 is needed only for independent video hosting. Set `HOWDOEY_PUBLIC_DOWNLOADS=false` to disable the button deliberately. A build verifies the archive against `release-metadata.json` before publishing. Replace both together for future releases. No macOS build is required in Cloudflare. The app remains a development-signed, non-notarized beta.
+
+The earlier R2 archive publishing instructions below describe the previous optional workflow; the current build serves the committed app archive directly regardless of the media base URL.
+
 # Cloudflare Workers Git deployment (current dashboard)
 
 The root `wrangler.jsonc` supports the dashboard’s `npx wrangler deploy` command. Wrangler runs the static build itself. This also works with `website` as the root directory using its matching configuration.
@@ -9,7 +15,7 @@ The root `wrangler.jsonc` supports the dashboard’s `npx wrangler deploy` comma
 | Deploy command | `npx wrangler deploy` |
 | Worker name | `howdoey` |
 
-No environment variable is needed for the initial website deployment. Without an R2 URL the two recorded videos use their public GitHub raw URLs. For release hosting, upload them to R2 and set `HOWDOEY_ASSETS_BASE_URL` as described below. The public app download remains unavailable until its archive has been uploaded and `HOWDOEY_PUBLIC_DOWNLOADS=true` is set. The Linux deployment never tries to build the Swift app.
+No environment variable is needed for the initial website deployment. Without an R2 URL the two recorded videos use their public GitHub raw URLs. For release hosting, upload them to R2 and set `HOWDOEY_ASSETS_BASE_URL` as described below. The public app download is served directly from the committed ZIP; it does not need R2. The Linux deployment never tries to build the Swift app.
 
 The current configs target Workers Static Assets. For a separate Pages deployment, use the dashboard’s Pages product with the static build settings below; remove the Workers config from that project’s configured root if its tooling rejects it. Do not run `wrangler pages deploy` against the Workers project.
 

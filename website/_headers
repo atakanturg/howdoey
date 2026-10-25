@@ -6,3 +6,8 @@
   Content-Security-Policy: frame-ancestors 'none'; object-src 'none'; base-uri 'self'
 /releases.json
   Cache-Control: no-store
+
+/downloads/*.zip
+  Content-Type: application/zip
+  Content-Disposition: attachment; filename="Howdoey-macOS-arm64.zip"
+  Cache-Control: no-cache

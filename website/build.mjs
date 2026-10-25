@@ -32,23 +32,22 @@ if (isPreview) {
 }
 await writeFile(join(output, 'index.html'), html);
 const filename = 'Howdoey-macOS-arm64.zip';
-const archive = join(root, '../desktop/dist', filename);
-const publiclyAvailable = process.env.HOWDOEY_PUBLIC_DOWNLOADS === 'true';
-if (publiclyAvailable && !configuredBase) throw new Error('Publishing downloads requires HOWDOEY_ASSETS_BASE_URL pointing to uploaded release artifacts.');
-let sha256 = null, bytes = null;
-try {
-  const data = await readFile(archive); sha256 = createHash('sha256').update(data).digest('hex'); bytes = data.length;
-  await cp(archive, join(stage, 'downloads', filename));
-  await writeFile(join(stage, 'downloads/SHA256SUMS.txt'), `${sha256}  ${filename}\n`);
- } catch (error) {
-  if (error.code !== 'ENOENT') throw error;
-  // Git-connected Pages builds do not have a local macOS build directory.
-  // Metadata identifies the separately uploaded R2 artifact.
-  const release = JSON.parse(await readFile(join(root, 'release-metadata.json'), 'utf8'));
-  if (release.filename !== filename || !/^[a-f0-9]{64}$/.test(release.sha256) || !Number.isSafeInteger(release.bytes) || release.bytes <= 0) throw new Error('Invalid release metadata');
-  sha256 = release.sha256; bytes = release.bytes;
-}
-await writeFile(join(output, 'releases.json'), JSON.stringify({ available: publiclyAvailable && !!sha256, filename, path: `${base}/downloads/${filename}`, sha256, bytes, notarized: false, localModel: 'qwen3.5:2b', modelDownload: 'First launch, approximately 3 GB' }, null, 2));
+// Publish the reviewed archive directly: it is below Cloudflare's per-file limit.
+// The committed copy is available in clean Linux/Git-connected builds.
+const archive = join(root, 'downloads', filename);
+const data = await readFile(archive);
+const sha256 = createHash('sha256').update(data).digest('hex');
+const bytes = data.length;
+const release = JSON.parse(await readFile(join(root, 'release-metadata.json'), 'utf8'));
+if (release.filename !== filename || release.sha256 !== sha256 || release.bytes !== bytes) throw new Error('Download archive does not match release-metadata.json');
+await mkdir(join(output, 'downloads'), { recursive: true });
+await cp(archive, join(output, 'downloads', filename));
+await cp(archive, join(stage, 'downloads', filename));
+const checksums = `${sha256}  ${filename}\n`;
+await writeFile(join(output, 'downloads/SHA256SUMS.txt'), checksums);
+await writeFile(join(stage, 'downloads/SHA256SUMS.txt'), checksums);
+const publiclyAvailable = process.env.HOWDOEY_PUBLIC_DOWNLOADS !== 'false';
+await writeFile(join(output, 'releases.json'), JSON.stringify({ available: publiclyAvailable, filename, path: `/downloads/${filename}`, sha256, bytes, notarized: false, localModel: 'qwen3.5:2b', modelDownload: 'First launch, approximately 3 GB' }, null, 2));
 // Pages rejects individual files above 25 MiB. Large artifacts belong in R2.
 async function ensureSize(path) {
   const { readdir } = await import('node:fs/promises');
@@ -61,4 +60,4 @@ async function ensureSize(path) {
 await ensureSize(output);
 console.log(`Static output: ${output}\nR2 uploads: ${stage}\nPublic download enabled: ${publiclyAvailable}`);
 
-if (!configuredBase) console.log('Video source: public GitHub recordings. Configure HOWDOEY_ASSETS_BASE_URL for R2. App downloads remain unavailable until published.');
+if (!configuredBase) console.log('Video source: public GitHub recordings. Configure HOWDOEY_ASSETS_BASE_URL for R2. The app archive is served directly with the website.');
